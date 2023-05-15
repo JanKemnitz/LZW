@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>LZW Encoder</title>
+</head>
+<body>
+<h1>LZW Encoder</h1>
+<form id="encode-form" onsubmit="encodeText(event)">
+    <label for="text-input">Text to encode:</label><br>
+    <input type="text" id="text-input" name="input"><br>
+    <button type="submit">Encode</button>
+</form>
+<br>
+<p id="encoded-output"></p>
+
+<p>Słowa dopisane do słownika</p>
+<table id="encoded-table">
+    <thead>
+    <tr>
+        <th>Value</th>
+        <th>Key</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+<br>
+
+<form id="decode-form" onsubmit="decodeText(event)">
+    <label for="text-input1">Text to decode:</label><br>
+    <input type="text" id="text-input1" name="input1"><br>
+    <button type="submit">Decode</button>
+</form>
+<br>
+<p id="decoded-output"></p>
+
+
+<script>
+    function encodeText(event) {
+        event.preventDefault();
+        const form = document.getElementById("encode-form");
+        const input = form.elements["input"].value;
+        fetch('/lzw/encode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `${input}`
+        })
+            .then(response => response.json())
+            .then(data => {
+                const output = document.getElementById("encoded-output");
+                const table = document.getElementById("encoded-table");
+                output.innerHTML = `Encoded output: ${data[0]}`;
+                let tableHtml = "<tr><th>Value</th><th>Key</th></tr>";
+                const sortedTable = Object.entries(data[1]).sort((a, b) => a[1] - b[1]);
+                sortedTable.forEach(entry => {
+                    tableHtml += `<tr><td>${entry[1]}</td><td>${entry[0]}</td></tr>`;
+                });
+                table.innerHTML = tableHtml;
+            })
+            .catch(error => console.error(error));
+    }
+
+    function decodeText(event) {
+        event.preventDefault();
+        const form = document.getElementById("decode-form");
+        const input = form.elements["input1"].value;
+        fetch('/lzw/decode', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: `${input}`
+        })
+            .then(response => response.text())
+            .then(data => {
+                const output = document.getElementById("decoded-output");
+                output.innerHTML = `Decoded output: ${data}`;
+            })
+            .catch(error => console.error(error));
+    }
+
+</script>
+</body>
+</html>
