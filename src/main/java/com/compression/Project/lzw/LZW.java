@@ -71,19 +71,22 @@ public class LZW {
 
         StringBuilder result = new StringBuilder();
         int old = op.get(0), n;
+        // Inicjalizacja zmiennych "s" i "c". "s" przechowuje aktualny łańcuch znaków, "c" przechowuje pierwszy znak "s".
         String s = table.get(old);
         String c = "";
         c += s.charAt(0);
         result.append(s);
-        int count = 256;
+        int count = 256; //licznik do generowania nowych kodów
 
         // Przetwarzanie ciągu wyjściowego
         for (int i = 0; i < op.size() - 1; i++) {
             n = op.get(i + 1);
             if (!table.containsKey(n)) {
+                // Jeśli kodu nie ma w tabeli, tworzymy nowy kod
                 s = table.get(old);
                 s = s + c;
             } else {
+                // Jeśli kod jest w tabeli, używamy go
                 s = table.get(n);
             }
             result.append(s);
